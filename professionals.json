@@ -1,0 +1,367 @@
+{
+  "platform": "Masterly",
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-25",
+  "professionals": [
+    {
+      "id": "PRO-001",
+      "name": "Marco Ferretti",
+      "photo": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.8,
+      "reviewsCount": 134,
+      "categoria": "Idraulico",
+      "quartiere": "Trastevere",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.8891,
+        "lng": 12.4698
+      },
+      "prezzoMedioOrario": 55,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Riparazione perdita d'acqua",     "prezzo": "da €70"  },
+        { "intervento": "Sostituzione rubinetteria",        "prezzo": "da €90"  },
+        { "intervento": "Installazione caldaia a gas",      "prezzo": "da €280" },
+        { "intervento": "Sblocco scarico/fogna",            "prezzo": "da €60"  },
+        { "intervento": "Sostituzione sifone / scolino",    "prezzo": "da €50"  }
+      ],
+      "bio": "Idraulico con certificazione UNI 11528, specializzato in impianti a gas e termoidraulici. Lavoro a Trastevere e dintorni da oltre 15 anni. Interventi in giornata, preventivo gratuito.",
+      "anniEsperienza": 15,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 5812 3401",
+        "email": "marco.ferretti@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-002",
+      "name": "Giulia Mancini",
+      "photo": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.9,
+      "reviewsCount": 87,
+      "categoria": "Elettricista",
+      "quartiere": "Prati",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.9077,
+        "lng": 12.4634
+      },
+      "prezzoMedioOrario": 60,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Sostituzione quadro elettrico",    "prezzo": "da €200" },
+        { "intervento": "Installazione prese e interruttori","prezzo": "da €40" },
+        { "intervento": "Messa a norma impianto (CEI 64-8)","prezzo": "da €350" },
+        { "intervento": "Installazione punto luce",         "prezzo": "da €50"  },
+        { "intervento": "Ricerca guasto elettrico",         "prezzo": "da €80"  }
+      ],
+      "bio": "Elettricista abilitata, iscritta alla Camera di Commercio di Roma. Specializzata in messa a norma di impianti civili e piccolo-commerciali. Puntuale, precisa e con preventivo trasparente.",
+      "anniEsperienza": 10,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 3211 9802",
+        "email": "giulia.mancini@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-003",
+      "name": "Antonio Russo",
+      "photo": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.6,
+      "reviewsCount": 212,
+      "categoria": "Pittore / Imbianchino",
+      "quartiere": "EUR",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.8268,
+        "lng": 12.4618
+      },
+      "prezzoMedioOrario": 35,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Tinteggiatura stanza (manodopera)",  "prezzo": "da €150" },
+        { "intervento": "Rifacimento intonaco a stucco",      "prezzo": "da €200" },
+        { "intervento": "Verniciatura infissi in legno",      "prezzo": "da €120" },
+        { "intervento": "Applicazione carta da parati",       "prezzo": "da €180" },
+        { "intervento": "Rasatura e levigatura pareti",       "prezzo": "da €90"  }
+      ],
+      "bio": "Imbianchino e decoratore con oltre 20 anni di esperienza nel settore residenziale e commerciale. Utilizzo esclusivamente pitture eco-compatibili a basse emissioni VOC. Intervento in 48 ore.",
+      "anniEsperienza": 20,
+      "disponibile": false,
+      "contatto": {
+        "telefono": "+39 06 5934 7701",
+        "email": "antonio.russo@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-004",
+      "name": "Sara Conti",
+      "photo": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face",
+      "rating": 5.0,
+      "reviewsCount": 58,
+      "categoria": "Interior Designer",
+      "quartiere": "Parioli",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.9238,
+        "lng": 12.5061
+      },
+      "prezzoMedioOrario": 90,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Consulenza arredamento (2h)",          "prezzo": "€180"    },
+        { "intervento": "Progetto monolocale completo",         "prezzo": "da €600" },
+        { "intervento": "Moodboard e palette colori",           "prezzo": "da €200" },
+        { "intervento": "Coordinamento lavori ristrutturazione","prezzo": "da €500" },
+        { "intervento": "Render 3D ambienti",                  "prezzo": "da €150" }
+      ],
+      "bio": "Interior designer laureata allo IED di Roma. Passione per il design mediterraneo contemporaneo. Ho collaborato con studi di architettura a Milano e Barcellona prima di tornare a Roma.",
+      "anniEsperienza": 8,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 8091 4403",
+        "email": "sara.conti@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-005",
+      "name": "Luca Bianchi",
+      "photo": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.7,
+      "reviewsCount": 176,
+      "categoria": "Falegname",
+      "quartiere": "Testaccio",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.8762,
+        "lng": 12.4758
+      },
+      "prezzoMedioOrario": 45,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Riparazione porta interna",         "prezzo": "da €60"  },
+        { "intervento": "Installazione armadio su misura",   "prezzo": "da €400" },
+        { "intervento": "Sostituzione serratura / maniglia", "prezzo": "da €50"  },
+        { "intervento": "Montaggio mobili IKEA / flatpack",  "prezzo": "da €40"  },
+        { "intervento": "Restauro mobili antichi",           "prezzo": "da €150" }
+      ],
+      "bio": "Falegname artigiano di terza generazione. Il mio laboratorio è nel cuore di Testaccio. Realizzo mobili su misura in legno massello e restauro pezzi d'antiquariato con tecniche tradizionali.",
+      "anniEsperienza": 18,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 5743 2205",
+        "email": "luca.bianchi@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-006",
+      "name": "Valeria Leone",
+      "photo": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.5,
+      "reviewsCount": 93,
+      "categoria": "Giardiniere",
+      "quartiere": "Monteverde",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.8803,
+        "lng": 12.4467
+      },
+      "prezzoMedioOrario": 30,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Taglio erba e siepi (giardino medio)","prezzo": "da €80"  },
+        { "intervento": "Piantumazione e allestimento aiuole", "prezzo": "da €120" },
+        { "intervento": "Progetto giardino privato",           "prezzo": "da €300" },
+        { "intervento": "Manutenzione mensile (contratto)",    "prezzo": "da €150/mese" },
+        { "intervento": "Installazione sistema irrigazione",   "prezzo": "da €200" }
+      ],
+      "bio": "Agronoma e paesaggista con specializzazione in giardini mediterranei e xerofilici. Mi piace creare spazi verdi che richiedono poca acqua e poca manutenzione senza rinunciare alla bellezza.",
+      "anniEsperienza": 7,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 5819 6606",
+        "email": "valeria.leone@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-007",
+      "name": "Davide Esposito",
+      "photo": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.4,
+      "reviewsCount": 305,
+      "categoria": "Muratore / Ristrutturazioni",
+      "quartiere": "Garbatella",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.8627,
+        "lng": 12.4819
+      },
+      "prezzoMedioOrario": 40,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Ristrutturazione bagno chiavi in mano", "prezzo": "da €3.500" },
+        { "intervento": "Demolizione parete non portante",        "prezzo": "da €250"   },
+        { "intervento": "Posa piastrelle (al mq)",               "prezzo": "da €25/mq" },
+        { "intervento": "Impermeabilizzazione terrazzo",          "prezzo": "da €400"   },
+        { "intervento": "Rifacimento massetto",                   "prezzo": "da €20/mq" }
+      ],
+      "bio": "Capomastro con 25 anni di esperienza in ristrutturazioni residenziali a Roma. Gestisco l'intero cantiere coordinando idraulici, elettricisti e piastrellisti. Preventivo dettagliato e trasparente.",
+      "anniEsperienza": 25,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 5138 8807",
+        "email": "davide.esposito@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-008",
+      "name": "Chiara Marini",
+      "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.9,
+      "reviewsCount": 64,
+      "categoria": "Addetta alle Pulizie / Home Cleaner",
+      "quartiere": "Flaminio",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.9248,
+        "lng": 12.4766
+      },
+      "prezzoMedioOrario": 18,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Pulizia ordinaria appartamento (2 locali)", "prezzo": "da €60"  },
+        { "intervento": "Pulizia straordinaria / post-trasloco",     "prezzo": "da €150" },
+        { "intervento": "Lavaggio e stiro biancheria (al kg)",       "prezzo": "da €4/kg"},
+        { "intervento": "Pulizia vetri interni/esterni",             "prezzo": "da €40"  },
+        { "intervento": "Contratto settimanale (4h/settimana)",      "prezzo": "da €280/mese" }
+      ],
+      "bio": "Professionista delle pulizie domestiche con certificazione HACCP. Puntuale, discreta e di assoluta fiducia. Utilizzo prodotti ecologici a mia cura, senza costi aggiuntivi per il cliente.",
+      "anniEsperienza": 6,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 3234 5508",
+        "email": "chiara.marini@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-009",
+      "name": "Roberto Fontana",
+      "photo": "https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.3,
+      "reviewsCount": 149,
+      "categoria": "Tecnico Climatizzazione (HVAC)",
+      "quartiere": "Ostiense",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.8616,
+        "lng": 12.4786
+      },
+      "prezzoMedioOrario": 65,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Installazione split mono (fino a 12.000 BTU)", "prezzo": "da €350" },
+        { "intervento": "Manutenzione annuale condizionatore",          "prezzo": "da €80"  },
+        { "intervento": "Ricarica gas refrigerante R32",               "prezzo": "da €120" },
+        { "intervento": "Pulizia filtri e sanificazione",              "prezzo": "da €50"  },
+        { "intervento": "Smontaggio e smaltimento vecchio impianto",   "prezzo": "da €100" }
+      ],
+      "bio": "Tecnico certificato F-GAS (Reg. UE 517/2014) con patentino valido. Installo e manutenziono impianti di climatizzazione di tutte le marche. Rispondo entro 2 ore e intervengo in giornata.",
+      "anniEsperienza": 12,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 5741 6609",
+        "email": "roberto.fontana@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-010",
+      "name": "Elena Ricci",
+      "photo": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.8,
+      "reviewsCount": 41,
+      "categoria": "Serramentista",
+      "quartiere": "Pigneto",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.8895,
+        "lng": 12.5278
+      },
+      "prezzoMedioOrario": 50,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Sostituzione finestra PVC doppio vetro", "prezzo": "da €400/finestra" },
+        { "intervento": "Installazione zanzariera plissé",        "prezzo": "da €120"          },
+        { "intervento": "Regolazione e manutenzione infissi",     "prezzo": "da €40"           },
+        { "intervento": "Installazione veneziana / tenda a rullo","prezzo": "da €80"           },
+        { "intervento": "Sopralluogo e preventivo",               "prezzo": "Gratuito"         }
+      ],
+      "bio": "Serramentista specializzata in infissi ad alta efficienza energetica. Collaboro con i principali brand (Schüco, Reynaers, Aluplast). Aiuto i clienti ad accedere ai bonus edilizi disponibili.",
+      "anniEsperienza": 9,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 2193 7710",
+        "email": "elena.ricci@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-011",
+      "name": "Francesco Lombardi",
+      "photo": "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.6,
+      "reviewsCount": 228,
+      "categoria": "Fabbro",
+      "quartiere": "Prenestino",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.8882,
+        "lng": 12.5404
+      },
+      "prezzoMedioOrario": 48,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Apertura porta con chiave bloccata",     "prezzo": "da €80"  },
+        { "intervento": "Sostituzione serratura di sicurezza",    "prezzo": "da €120" },
+        { "intervento": "Installazione cancello in ferro",        "prezzo": "da €500" },
+        { "intervento": "Realizzazione inferriate su misura",     "prezzo": "da €300" },
+        { "intervento": "Intervento urgente h24 (maggiorazione)", "prezzo": "+50%"    }
+      ],
+      "bio": "Fabbro e serraturiere con officina propria al Prenestino. Pronto intervento 24 ore su 24 per aperture di emergenza. Realizzo anche lavori su misura in ferro e acciaio inox per esterni.",
+      "anniEsperienza": 22,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 2711 3311",
+        "email": "francesco.lombardi@masterly.it"
+      }
+    },
+    {
+      "id": "PRO-012",
+      "name": "Marta De Angelis",
+      "photo": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face",
+      "rating": 4.7,
+      "reviewsCount": 77,
+      "categoria": "Fotografa Immobiliare",
+      "quartiere": "Nomentano",
+      "citta": "Roma",
+      "coordinate": {
+        "lat": 41.9155,
+        "lng": 12.5192
+      },
+      "prezzoMedioOrario": 75,
+      "valuta": "EUR",
+      "listino": [
+        { "intervento": "Servizio foto appartamento (fino a 80 mq)", "prezzo": "€150"   },
+        { "intervento": "Virtual tour 360° interattivo",             "prezzo": "da €200" },
+        { "intervento": "Drone per esterni / cortili",              "prezzo": "da €100" },
+        { "intervento": "Home staging fotografico",                  "prezzo": "da €250" },
+        { "intervento": "Consegna file entro 24h (urgente)",        "prezzo": "+30%"    }
+      ],
+      "bio": "Fotografa specializzata in real estate e home staging. Le mie foto aumentano il numero di visite ai tuoi annunci. Lavoro con agenzie immobiliari di tutta Roma e consegno entro 48 ore.",
+      "anniEsperienza": 5,
+      "disponibile": true,
+      "contatto": {
+        "telefono": "+39 06 8623 0112",
+        "email": "marta.deangelis@masterly.it"
+      }
+    }
+  ]
+}
