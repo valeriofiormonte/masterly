@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Masterly — Dashboard Professionista</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{fontFamily:{display:['"Cormorant Garamond"','serif'],body:['"DM Sans"','sans-serif']}}}};</script>
+
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{font-family:'DM Sans',sans-serif;background:#f1f5f4;color:#1c1917;margin:0;overflow-x:hidden}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#e7e5e4}::-webkit-scrollbar-thumb{background:#a8a29e;border-radius:99px}
+    .no-scrollbar::-webkit-scrollbar{display:none}
+
+    /* ── Shell ── */
+    #shell{display:flex;min-height:100dvh}
+
+    /* ── Sidebar ── */
+    .db-sidebar{width:240px;background:#0d1f16;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100dvh;overflow-y:auto}
+    @media(max-width:768px){.db-sidebar{display:none}}
+    .db-nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:500;color:#6ee7b7;transition:background .15s,color .15s;cursor:pointer;text-decoration:none;user-select:none}
+    .db-nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+    .db-nav-item.active{background:rgba(5,150,105,.22);color:#fff}
+    .db-nav-item.active .nav-dot{background:#34d399}
+    .nav-dot{width:6px;height:6px;border-radius:50%;background:transparent;margin-left:auto;transition:background .15s}
+
+    /* ── Main ── */
+    .db-main{flex:1;overflow-y:auto;padding:28px 20px 60px}
+    @media(min-width:769px){.db-main{padding:32px 36px 72px}}
+
+    /* ── Mobile topbar ── */
+    .db-topbar{display:none;align-items:center;justify-content:space-between;background:#0d1f16;padding:13px 20px;position:sticky;top:0;z-index:40}
+    @media(max-width:768px){.db-topbar{display:flex}}
+
+    /* ── Mobile bottom nav ── */
+    .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e7e5e4;z-index:30;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+    @media(max-width:768px){.mob-nav{display:flex}}
+    .mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;font-size:9px;font-weight:600;color:#a8a29e;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border:none;background:none;transition:color .15s}
+    .mob-nav-btn.active{color:#059669}
+    .mob-nav-btn svg{width:20px;height:20px}
+
+    /* ── Sections ── */
+    .db-section{display:none}
+    .db-section.active{display:block}
+
+    /* ── Shared ── */
+    .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#a8a29e;margin-bottom:14px}
+    .widget{background:white;border-radius:20px;border:1px solid #e7e5e4;padding:20px}
+    .pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+    .pill-green{background:#d1fae5;color:#065f46}.pill-yellow{background:#fef9c3;color:#713f12}.pill-blue{background:#dbeafe;color:#1e40af}.pill-red{background:#fee2e2;color:#991b1b}.pill-slate{background:#f1f5f9;color:#475569}
+    .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .35s ease forwards}
+    .notif-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;border:1.5px solid white;position:absolute;top:-2px;right:-2px}
+
+    /* ── Stat cards (Overview) ── */
+    .stat-card{background:white;border-radius:18px;padding:22px 24px;border:1px solid #e7e5e4;transition:box-shadow .2s,transform .2s;position:relative;overflow:hidden}
+    .stat-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.08);transform:translateY(-2px)}
+    .stat-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:18px 18px 0 0}
+    .chart-bar{flex:1;border-radius:6px 6px 0 0;transition:height .55s cubic-bezier(.34,1,.64,1);cursor:pointer;min-width:0}
+    .chart-bar:hover{filter:brightness(1.12)}
+    .agenda-mini-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f5f5f4}
+    .agenda-mini-row:last-child{border-bottom:none}
+
+    /* ════════════════════════════════
+       AGENDA
+    ════════════════════════════════ */
+    .ag-filter-btn{font-size:11px;font-weight:600;padding:6px 14px;border-radius:99px;border:1.5px solid #e7e5e4;background:white;color:#78716c;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .ag-filter-btn:hover{border-color:#059669;color:#059669}
+    .ag-filter-btn.active{background:#059669;border-color:#059669;color:white}
+
+    /* Day header */
+    .day-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;margin-top:4px}
+    .day-badge{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:99px}
+    .day-badge-oggi{background:#0d1f16;color:#6ee7b7}
+    .day-badge-domani{background:#f1f5f4;color:#64748b;border:1px solid #e7e5e4}
+
+    /* Appointment card */
+    .appt-card{background:white;border:1px solid #e7e5e4;border-radius:18px;padding:0;overflow:hidden;transition:box-shadow .2s,transform .2s;margin-bottom:12px}
+    .appt-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.08);transform:translateY(-1px)}
+    .appt-card-left-bar{width:4px;border-radius:4px 0 0 4px;flex-shrink:0;align-self:stretch}
+    .appt-card-body{padding:16px 18px;flex:1;min-width:0}
+
+    /* Status specific border/accent */
+    .appt-attesa   .appt-card-left-bar{background:#94a3b8}
+    .appt-in-corso .appt-card-left-bar{background:#0ea5e9}
+    .appt-completato .appt-card-left-bar{background:#059669}
+
+    /* Status badge */
+    .st-attesa   {background:#f1f5f9;color:#475569}
+    .st-in-corso {background:#dbeafe;color:#1e40af;animation:pulseBlu 2s ease infinite}
+    .st-completato{background:#d1fae5;color:#065f46}
+    @keyframes pulseBlu{0%,100%{opacity:1}50%{opacity:.6}}
+
+    /* Timer */
+    .timer-display{font-variant-numeric:tabular-nums;font-size:13px;font-weight:700;color:#0ea5e9;letter-spacing:.04em;padding:3px 10px;background:#dbeafe;border-radius:8px;display:inline-block}
+
+    /* Action buttons */
+    .btn-avvia{font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px;background:#059669;color:white;border:none;cursor:pointer;transition:background .15s,transform .1s;white-space:nowrap}
+    .btn-avvia:hover{background:#047857}
+    .btn-avvia:active{transform:scale(.97)}
+    .btn-chiudi{font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px;background:white;color:#059669;border:1.5px solid #059669;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .btn-chiudi:hover{background:#d1fae5}
+    .btn-done{font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px;background:#f0fdf4;color:#15803d;border:1.5px solid #bbf7d0;cursor:default;white-space:nowrap}
+    .btn-map{font-size:11px;font-weight:600;padding:5px 11px;border-radius:8px;background:#f8fafc;color:#475569;border:1px solid #e7e5e4;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap}
+    .btn-map:hover{background:#e0f2fe;border-color:#bae6fd;color:#0ea5e9}
+
+    /* ── Popup overlay ── */
+    #popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+    #popup-overlay.open{display:flex}
+    #popup-box{background:white;border-radius:20px;padding:28px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.18);animation:fadeIn .3s ease}
+    .popup-item-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f5f5f4}
+    .popup-item-row:last-child{border-bottom:none}
+    .popup-qty-ctrl{display:flex;align-items:center;gap:6px}
+    .popup-qty-btn{width:24px;height:24px;border-radius:6px;border:1px solid #e7e5e4;background:white;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;line-height:1}
+    .popup-qty-btn:hover{background:#f0fdf4;border-color:#6ee7b7}
+    .popup-qty-val{font-size:13px;font-weight:700;color:#1c1917;min-width:18px;text-align:center}
+
+    /* ════════════════════════════════
+       MAGAZZINO
+    ════════════════════════════════ */
+    .mag-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .mag-table-wrap::-webkit-scrollbar{height:4px}
+    .mag-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:680px}
+    .mag-table thead th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#a8a29e;background:#f9faf8;border-bottom:1px solid #f0efed;white-space:nowrap}
+    .mag-table thead th:first-child{border-radius:10px 0 0 10px}
+    .mag-table thead th:last-child{border-radius:0 10px 10px 0}
+    .mag-table tbody tr{transition:background .12s}
+    .mag-table tbody tr:hover td{background:#f9faf8}
+    .mag-table tbody td{padding:13px 14px;border-bottom:1px solid #f5f5f4;vertical-align:middle}
+    .mag-table tbody tr:last-child td{border-bottom:none}
+    .stock-bar-bg{background:#f0efed;border-radius:99px;height:7px;width:100px;overflow:hidden;display:inline-block}
+    .stock-bar-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.34,1,.64,1)}
+    .badge-ok  {background:#d1fae5;color:#065f46;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+    .badge-low {background:#fef9c3;color:#713f12;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+    .badge-crit{background:#fee2e2;color:#991b1b;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap;animation:pulseRed 2s ease infinite}
+    @keyframes pulseRed{0%,100%{opacity:1}50%{opacity:.6}}
+    .btn-order{font-size:11px;font-weight:600;padding:5px 12px;border-radius:8px;border:1.5px solid #ef4444;color:#ef4444;background:transparent;cursor:pointer;transition:all .18s;white-space:nowrap}
+    .btn-order:hover{background:#fee2e2}
+    .btn-order.loading{border-color:#a8a29e;color:#a8a29e;pointer-events:none}
+    .btn-order.done{border-color:#059669;color:#059669;background:#d1fae5;pointer-events:none}
+    .mag-filter{font-size:11px;font-weight:600;padding:5px 13px;border-radius:99px;border:1.5px solid #e7e5e4;background:white;color:#78716c;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .mag-filter:hover{border-color:#059669;color:#059669}
+    .mag-filter.active{background:#059669;border-color:#059669;color:white}
+    .mag-search{background:white;border:1.5px solid #e7e5e4;border-radius:10px;padding:7px 12px 7px 34px;font-size:13px;font-family:'DM Sans',sans-serif;color:#1c1917;outline:none;transition:border-color .18s,box-shadow .18s;width:100%;max-width:220px}
+    .mag-search:focus{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.10)}
+    .mag-search::placeholder{color:#a8a29e}
+    .activity-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f4}
+    .activity-row:last-child{border-bottom:none}
+    .activity-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+
+    /* ── Reviews ── */
+    .review-card{background:white;border:1px solid #e7e5e4;border-radius:16px;padding:18px 20px;transition:box-shadow .2s;margin-bottom:12px}
+    .review-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.07)}
+
+    /* bottom padding for mobile nav */
+    @media(max-width:768px){.db-main{padding-bottom:90px}}
+  </style>
+</head>
+<body>
+
+<!-- ── Mobile top bar ── -->
+<div class="db-topbar">
+  <div class="flex items-center gap-2">
+    <span class="font-display text-lg font-semibold text-white">Masterly</span>
+    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mb-0.5 inline-block"></span>
+  </div>
+  <div class="flex items-center gap-3">
+    <span id="mob-section-title" class="text-emerald-300 text-sm font-medium">Panoramica</span>
+    <a href="index.html" class="text-emerald-700 hover:text-white transition-colors">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+    </a>
+  </div>
+</div>
+
+<div id="shell">
+
+  <!-- ════════ SIDEBAR ════════ -->
+  <aside class="db-sidebar">
+    <div class="px-6 py-6 border-b border-white/[.08]">
+      <div class="flex items-center gap-1.5">
+        <span class="font-display text-xl font-semibold text-white">Masterly</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mb-1 inline-block"></span>
+      </div>
+      <p class="text-emerald-800 text-[10px] mt-0.5 tracking-widest uppercase font-medium">Pannello Professionista</p>
+    </div>
+
+    <div class="px-4 py-4 border-b border-white/[.08]">
+      <div class="flex items-center gap-3 bg-white/[.06] rounded-xl p-3">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face"
+             class="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-500/50 shrink-0"/>
+        <div class="min-w-0">
+          <p class="text-white text-xs font-semibold truncate">Marco Ferretti</p>
+          <p class="text-emerald-500 text-[10px]">Idraulico · Trastevere</p>
+        </div>
+        <div class="ml-auto shrink-0 w-2 h-2 rounded-full bg-emerald-400"></div>
+      </div>
+    </div>
+
+    <nav class="px-3 py-4 flex-1 space-y-0.5">
+      <p class="text-[10px] uppercase tracking-widest text-emerald-900 font-medium px-3 mb-2 mt-1">Principale</p>
+      <a class="db-nav-item active" data-sec="overview" onclick="showSection('overview',this)">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+        Panoramica<span class="nav-dot"></span>
+      </a>
+      <a class="db-nav-item" data-sec="agenda" onclick="showSection('agenda',this)">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+        Agenda<span class="nav-dot"></span>
+      </a>
+      <a class="db-nav-item" data-sec="magazzino" onclick="showSection('magazzino',this)">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+        Magazzino<span class="nav-dot"></span>
+      </a>
+      <a class="db-nav-item" data-sec="recensioni" onclick="showSection('recensioni',this)">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+        Recensioni<span class="nav-dot"></span>
+      </a>
+      <div class="my-3 border-t border-white/[.08]"></div>
+      <p class="text-[10px] uppercase tracking-widest text-emerald-900 font-medium px-3 mb-2">Account</p>
+      <a class="db-nav-item" data-sec="profilo" onclick="showSection('profilo',this)">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+        Il mio profilo<span class="nav-dot"></span>
+      </a>
+    </nav>
+
+    <div class="px-4 py-5 border-t border-white/[.08]">
+      <a href="index.html" class="flex items-center gap-2.5 text-emerald-700 hover:text-white hover:bg-white/[.08] transition-all rounded-xl px-3 py-2.5 text-sm font-medium">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+        Esci dalla Dashboard
+      </a>
+    </div>
+  </aside>
+
+  <!-- ════════ MAIN CONTENT ════════ -->
+  <main class="db-main">
+
+    <!-- ══════════════════════════════
+         SEZIONE: PANORAMICA
+    ══════════════════════════════ -->
+    <div id="sec-overview" class="db-section active">
+
+      <!-- Welcome -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <p class="text-xs text-stone-400 uppercase tracking-widest font-medium mb-1">Lunedì 26 Aprile 2026</p>
+          <h1 class="font-display text-3xl md:text-4xl font-semibold text-stone-900 leading-tight">
+            Bentornato, <em class="text-emerald-600 not-italic">Marco</em> 👋
+          </h1>
+          <p class="text-stone-500 text-sm mt-1">Hai <strong class="text-stone-700">3 nuove richieste</strong> e <strong class="text-stone-700">4 interventi</strong> in programma oggi.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <button class="w-10 h-10 bg-white border border-stone-200 rounded-xl flex items-center justify-center hover:bg-stone-50 transition-colors shadow-sm">
+              <svg class="w-5 h-5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+              <span class="notif-dot"></span>
+            </button>
+          </div>
+          <button onclick="showSection('agenda',document.querySelector('[data-sec=agenda]'))" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shadow-md shadow-emerald-200">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Nuovo Intervento
+          </button>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <p class="section-label">Riepilogo del mese</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="stat-card">
+          <div class="stat-accent" style="background:linear-gradient(90deg,#059669,#34d399)"></div>
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center"><svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+            <span class="pill pill-green">+18% ↑</span>
+          </div>
+          <p class="text-xs text-stone-400 font-medium uppercase tracking-wider mb-1">Guadagni del mese</p>
+          <p class="font-display text-3xl font-semibold text-stone-900">€3.240</p>
+          <p class="text-xs text-stone-400 mt-3 flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>vs €2.750 mese scorso</p>
+        </div>
+        <div class="stat-card">
+          <div class="stat-accent" style="background:linear-gradient(90deg,#0ea5e9,#38bdf8)"></div>
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center"><svg class="w-5 h-5 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+            <span class="pill pill-blue">Aprile</span>
+          </div>
+          <p class="text-xs text-stone-400 font-medium uppercase tracking-wider mb-1">Lavori completati</p>
+          <p class="font-display text-3xl font-semibold text-stone-900">24</p>
+          <p class="text-xs text-stone-400 mt-3 flex items-center gap-1"><svg class="w-3 h-3 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>Prossimo: ore 09:00 oggi</p>
+        </div>
+        <div class="stat-card">
+          <div class="stat-accent" style="background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div>
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center"><svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div>
+            <span class="pill pill-yellow">Da rispondere</span>
+          </div>
+          <p class="text-xs text-stone-400 font-medium uppercase tracking-wider mb-1">Richieste pendenti</p>
+          <p class="font-display text-3xl font-semibold text-stone-900">3</p>
+          <button onclick="showSection('agenda',document.querySelector('[data-sec=agenda]'))" class="mt-3 text-xs text-amber-600 font-medium hover:underline flex items-center gap-0.5">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>Visualizza tutte
+          </button>
+        </div>
+      </div>
+
+      <!-- Chart + Mini agenda -->
+      <div class="grid md:grid-cols-5 gap-5 mb-2">
+        <div class="widget md:col-span-2">
+          <div class="flex items-center justify-between mb-5">
+            <div><p class="section-label mb-0">Guadagni settimanali</p><p class="font-display text-2xl font-semibold text-stone-900 mt-0.5">€3.240</p></div>
+            <span class="pill pill-green">Aprile 2026</span>
+          </div>
+          <div class="flex items-end gap-1.5 h-28" id="bar-chart"></div>
+          <div class="flex justify-between mt-1.5">
+            <span class="text-[10px] text-stone-400">Lun</span><span class="text-[10px] text-stone-400">Mar</span><span class="text-[10px] text-stone-400">Mer</span><span class="text-[10px] text-stone-400">Gio</span><span class="text-[10px] text-stone-400">Ven</span><span class="text-[10px] text-stone-400">Sab</span><span class="text-[10px] text-stone-400">Dom</span>
+          </div>
+        </div>
+
+        <div class="widget md:col-span-3">
+          <div class="flex items-center justify-between mb-4">
+            <p class="section-label mb-0">Prossimi appuntamenti</p>
+            <button onclick="showSection('agenda',document.querySelector('[data-sec=agenda]'))" class="text-xs text-emerald-600 font-medium hover:underline">Apri agenda →</button>
+          </div>
+          <div id="overview-agenda"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════
+         SEZIONE: AGENDA
+    ══════════════════════════════ -->
+    <div id="sec-agenda" class="db-section">
+
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <p class="section-label mb-0">Agenda Interventi</p>
+          <p class="text-xs text-stone-400 mt-0.5">Lunedì 26 – Martedì 27 Aprile 2026</p>
+        </div>
+        <button class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shadow-md shrink-0">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Nuovo Appuntamento
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex flex-wrap items-center gap-2 mb-6">
+        <span class="text-xs text-stone-400 font-medium shrink-0">Mostra:</span>
+        <button class="ag-filter-btn active" data-filter="tutti"     onclick="setAgFilter(this)">Tutti</button>
+        <button class="ag-filter-btn" data-filter="attesa"           onclick="setAgFilter(this)">In attesa</button>
+        <button class="ag-filter-btn" data-filter="in-corso"         onclick="setAgFilter(this)">In corso</button>
+        <button class="ag-filter-btn" data-filter="completato"       onclick="setAgFilter(this)">Completati</button>
+      </div>
+
+      <!-- Days -->
+      <div id="agenda-oggi-block"></div>
+      <div id="agenda-domani-block" class="mt-2"></div>
+
+    </div>
+
+
+    <!-- ══════════════════════════════
+         SEZIONE: MAGAZZINO
+    ══════════════════════════════ -->
+    <div id="sec-magazzino" class="db-section">
+
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div>
+          <p class="section-label mb-0">Centro di Controllo Magazzino</p>
+          <p class="text-xs text-stone-400 mt-0.5">Aggiornato oggi alle 07:30 · <span id="mag-count"></span></p>
+        </div>
+        <button class="flex items-center gap-1.5 text-xs bg-stone-900 text-white px-4 py-2 rounded-xl hover:bg-stone-700 transition-colors font-medium shrink-0">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Aggiungi Prodotto
+        </button>
+      </div>
+
+      <div class="widget mb-5">
+        <!-- Toolbar -->
+        <div class="flex flex-wrap items-center gap-3 mb-5">
+          <div class="relative shrink-0">
+            <svg class="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"/></svg>
+            <input id="mag-search" class="mag-search" type="text" placeholder="Cerca prodotto, SKU…" oninput="filterInventory()"/>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button class="mag-filter active" data-cat="tutti"       onclick="setCatFilter(this)">Tutti</button>
+            <button class="mag-filter"        data-cat="Idraulica"   onclick="setCatFilter(this)">🔧 Idraulica</button>
+            <button class="mag-filter"        data-cat="Elettronica" onclick="setCatFilter(this)">⚡ Elettronica</button>
+            <button class="mag-filter"        data-cat="Minuterie"   onclick="setCatFilter(this)">🔩 Minuterie</button>
+            <button class="mag-filter"        data-cat="Termoidr."   onclick="setCatFilter(this)">🌡️ Termoidr.</button>
+          </div>
+          <button id="toggle-low" onclick="toggleLowOnly()" class="mag-filter ml-auto flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-red-400 inline-block"></span>Solo critici
+          </button>
+        </div>
+        <!-- Table -->
+        <div class="mag-table-wrap">
+          <table class="mag-table">
+            <thead><tr>
+              <th>Prodotto</th><th>Categoria</th><th>SKU</th><th>Brand</th>
+              <th>Scorta</th><th>Qtà / Min.</th><th>Stato</th><th>Azione</th>
+            </tr></thead>
+            <tbody id="mag-tbody"></tbody>
+          </table>
+          <p id="mag-empty" class="hidden text-center text-sm text-stone-400 py-8">Nessun prodotto corrisponde ai filtri.</p>
+        </div>
+      </div>
+
+      <!-- Activity log + note -->
+      <div class="grid md:grid-cols-2 gap-5">
+        <div class="widget">
+          <div class="flex items-center justify-between mb-4">
+            <p class="section-label mb-0">Attività Recente</p>
+            <span class="text-[10px] text-stone-400 font-medium">Ultime 24h</span>
+          </div>
+          <div id="activity-log"></div>
+        </div>
+        <div class="widget">
+          <p class="section-label mb-3">Fornitori rapidi</p>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100">
+              <div><p class="text-sm font-semibold text-stone-800">IDRO-Expert</p><p class="text-xs text-stone-400">Idraulica & Termoidr.</p></div>
+              <div class="flex gap-2">
+                <button class="btn-map">📞 Chiama</button>
+                <button class="btn-map">🛒 Catalogo</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100">
+              <div><p class="text-sm font-semibold text-stone-800">TermoParts</p><p class="text-xs text-stone-400">Minuterie & PTFE</p></div>
+              <div class="flex gap-2">
+                <button class="btn-map">📞 Chiama</button>
+                <button class="btn-map">🛒 Catalogo</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100">
+              <div><p class="text-sm font-semibold text-stone-800">ElectroTherm</p><p class="text-xs text-stone-400">Elettronica & sensori</p></div>
+              <div class="flex gap-2">
+                <button class="btn-map">📞 Chiama</button>
+                <button class="btn-map">🛒 Catalogo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════
+         SEZIONE: RECENSIONI
+    ══════════════════════════════ -->
+    <div id="sec-recensioni" class="db-section">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <p class="section-label mb-0">Recensioni Clienti</p>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-amber-400 text-lg leading-none">★★★★★</span>
+            <span class="font-semibold text-stone-900">4.8</span>
+            <span class="text-xs text-stone-400">su 134 recensioni verificate</span>
+          </div>
+        </div>
+      </div>
+      <div id="reviews-list"></div>
+    </div>
+
+
+    <!-- ══════════════════════════════
+         SEZIONE: PROFILO (placeholder)
+    ══════════════════════════════ -->
+    <div id="sec-profilo" class="db-section">
+      <p class="section-label">Il mio profilo</p>
+      <div class="widget text-center py-12">
+        <p class="text-4xl mb-3">🛠️</p>
+        <p class="font-display text-xl text-stone-700">Sezione in costruzione</p>
+        <p class="text-sm text-stone-400 mt-1">Le impostazioni del profilo saranno disponibili a breve.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ════════ MOBILE BOTTOM NAV ════════ -->
+<nav class="mob-nav">
+  <button class="mob-nav-btn active" data-sec="overview" onclick="showSection('overview',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+    Home
+  </button>
+  <button class="mob-nav-btn" data-sec="agenda" onclick="showSection('agenda',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+    Agenda
+  </button>
+  <button class="mob-nav-btn" data-sec="magazzino" onclick="showSection('magazzino',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+    Magazzino
+  </button>
+  <button class="mob-nav-btn" data-sec="recensioni" onclick="showSection('recensioni',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+    Recensioni
+  </button>
+</nav>
+
+
+<!-- ════════ POPUP: PEZZI USATI ════════ -->
+<div id="popup-overlay" onclick="closePopup(event)">
+  <div id="popup-box">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="font-display text-xl font-semibold text-stone-900">Pezzi usati? 🔧</h3>
+        <p class="text-xs text-stone-400 mt-0.5" id="popup-job-label">Indica i materiali impiegati nell'intervento.</p>
+      </div>
+      <button onclick="closePopup()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 transition-colors flex items-center justify-center">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="popup-items" class="mb-5 max-h-64 overflow-y-auto"></div>
+    <div class="flex gap-3">
+      <button onclick="closePopup()" class="flex-1 py-3 rounded-xl border border-stone-200 text-sm font-medium text-stone-600 hover:bg-stone-50 transition-colors">Salta</button>
+      <button onclick="confirmPopup()" class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors">Conferma e chiudi ✓</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════ -->
+<script>
+
+/* ══════════════════════════════════
+   DATA
+══════════════════════════════════ */
+
+const APPOINTMENTS = [
+  { id:'A1', day:'oggi',   start:'09:00', end:'10:30', client:'Mario Rossi',    addr:'Via della Lungaretta 12, Trastevere',    type:'Riparazione perdita acqua',           status:'in-corso',  phone:'+39 339 1234567', note:'Cliente ha segnalato perdita sotto lavandino cucina.' },
+  { id:'A2', day:'oggi',   start:'11:30', end:'13:00', client:'Anna Conti',     addr:"Via dei Giubbonari 34, Campo de' Fiori", type:'Sostituzione rubinetteria bagno',     status:'attesa',    phone:'+39 347 9876543', note:'Sostituzione completa set rubinetti.' },
+  { id:'A3', day:'oggi',   start:'14:00', end:'15:00', client:'Luca Bianchi',   addr:'Via Ostiense 120, Ostiense',             type:'Sblocco scarico bagno',               status:'attesa',    phone:'+39 335 5556789', note:'' },
+  { id:'A4', day:'oggi',   start:'16:30', end:'17:30', client:'Sara Leone',     addr:'Viale Trastevere 88, Trastevere',        type:'Preventivo impianto caldaia',         status:'attesa',    phone:'+39 328 2223344', note:'Sopralluogo per sostituzione caldaia vecchia.' },
+  { id:'A5', day:'domani', start:'09:00', end:'11:30', client:'Roberto Marini', addr:'Via Tiburtina 200, Tiburtino',           type:'Installazione caldaia a condensazione',status:'attesa',   phone:'+39 349 8887766', note:'Portare valvola termostatica Danfoss.' },
+  { id:'A6', day:'domani', start:'12:00', end:'13:00', client:'Giulia Ferraro', addr:'Via Nomentana 45, Nomentano',            type:'Riparazione valvola termosifone',     status:'attesa',    phone:'+39 333 1112233', note:'' },
+  { id:'A7', day:'domani', start:'15:00', end:'16:00', client:'Franco De Luca', addr:'Via Appia Nuova 320, Appio Latino',      type:'Controllo impianto gas (revisione)', status:'attesa',    phone:'+39 347 4445566', note:'Portare certificati revisione annuale.' },
+];
+
+const INVENTORY = [
+  { id:1, name:'Valvola a sfera ½"',          brand:'Watts',               sku:'WA-VSF-012', cat:'Idraulica',   qty:2,  min:8,  unit:'pz',   fornitore:'IDRO-Expert' },
+  { id:2, name:'Raccordo a T ½"',             brand:'Giacomini',           sku:'GI-RAT-012', cat:'Idraulica',   qty:14, min:10, unit:'pz',   fornitore:'IDRO-Expert' },
+  { id:3, name:'Guarnizione O-ring ø22',      brand:'Rubinetterie Bresciane', sku:'RB-GOR-022', cat:'Minuterie', qty:3,  min:20, unit:'pz',   fornitore:'TermoParts' },
+  { id:4, name:'Teflon / Nastro PTFE',        brand:'Henkel',              sku:'HE-NPT-019', cat:'Minuterie',   qty:2,  min:10, unit:'rot.', fornitore:'TermoParts' },
+  { id:5, name:'Sifone lavabo universale',    brand:'Viega',               sku:'VI-SLU-001', cat:'Idraulica',   qty:5,  min:4,  unit:'pz',   fornitore:'IDRO-Expert' },
+  { id:6, name:'Termostato caldaia digitale', brand:'Honeywell',           sku:'HW-TCD-300', cat:'Elettronica', qty:1,  min:2,  unit:'pz',   fornitore:'ElectroTherm' },
+  { id:7, name:'Flussometro digitale DN15',   brand:'Kamstrup',            sku:'KA-FDN-015', cat:'Elettronica', qty:0,  min:2,  unit:'pz',   fornitore:'ElectroTherm' },
+  { id:8, name:'Valvola termostatica radiatore', brand:'Danfoss',          sku:'DA-VTR-RA2', cat:'Termoidr.',   qty:9,  min:6,  unit:'pz',   fornitore:'TermoParts' },
+  { id:9, name:'Tubo multistrato Ø16×2',      brand:'Rehau',               sku:'RE-TM16-200',cat:'Termoidr.',   qty:18, min:10, unit:'m',    fornitore:'IDRO-Expert' },
+  { id:10,name:'Vite testa piana M6×40',      brand:'Bossard',             sku:'BO-VTP-M640',cat:'Minuterie',   qty:60, min:30, unit:'pz',   fornitore:'TermoParts' },
+];
+
+const ACTIVITY = [
+  { color:'#ef4444', icon:'📤', text:'Rimosse 2 guarnizioni O-ring per intervento Sig. Rossi', time:'09:14' },
+  { color:'#059669', icon:'📥', text:'Caricati 10 raccordi a T da fornitore IDRO-Expert',      time:'08:30' },
+  { color:'#0891b2', icon:'🛒', text:'Ordine rapido: 20 O-ring inviato a TermoParts',           time:'Ieri 17:55' },
+  { color:'#ef4444', icon:'📤', text:'Rimosso 1 sifone lavabo per intervento Sig.ra Conti',    time:'Ieri 11:30' },
+  { color:'#059669', icon:'📥', text:'Ricevuti 2 rotoli Teflon PTFE — stock aggiornato',       time:'Ieri 09:00' },
+  { color:'#f59e0b', icon:'⚠️', text:'Stock critico: Flussometro digitale DN15 esaurito',      time:'Ieri 08:45' },
+];
+
+const REVIEWS = [
+  { name:'Mario Rossi',   avatar:'https://i.pravatar.cc/80?img=12', rating:5, date:'24 Apr', lavoro:'Riparazione perdita',      text:"Marco è arrivato puntuale e ha risolto la perdita in meno di un'ora. Professionale e preciso!" },
+  { name:'Anna Conti',    avatar:'https://i.pravatar.cc/80?img=44', rating:5, date:'21 Apr', lavoro:'Sostituzione rubinetteria', text:'Eccellente! Ha sostituito tutta la rubinetteria del bagno in modo impeccabile. Lo richiamerò.' },
+  { name:'Luca Fontana',  avatar:'https://i.pravatar.cc/80?img=33', rating:4, date:'18 Apr', lavoro:'Installazione caldaia',    text:"Bravo e competente. Ha impiegato un po' più del previsto, ma il lavoro è a regola d'arte." },
+  { name:'Giulia Marini', avatar:'https://i.pravatar.cc/80?img=57', rating:5, date:'15 Apr', lavoro:'Scarico bloccato urgente', text:'Fantastico! Intervento urgente risolto in 30 minuti. Prezzo onesto e grande cortesia.' },
+  { name:'Fabio Testa',   avatar:'https://i.pravatar.cc/80?img=68', rating:4, date:'10 Apr', lavoro:'Preventivo e consulenza',  text:'Molto disponibile e chiaro nella spiegazione dei costi. Tornerò sicuramente.' },
+];
+
+const WEEKLY = [580, 920, 410, 760, 640, 290, 0];
+
+
+/* ══════════════════════════════════
+   SECTION ROUTING
+══════════════════════════════════ */
+
+function showSection(sec, el) {
+  // Hide all sections
+  document.querySelectorAll('.db-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + sec).classList.add('active');
+
+  // Update sidebar nav
+  document.querySelectorAll('.db-nav-item').forEach(i => i.classList.remove('active'));
+  const sidebarItem = document.querySelector(`.db-sidebar [data-sec="${sec}"]`);
+  if (sidebarItem) sidebarItem.classList.add('active');
+
+  // Update mobile bottom nav
+  document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('active'));
+  const mobItem = document.querySelector(`.mob-nav-btn[data-sec="${sec}"]`);
+  if (mobItem) mobItem.classList.add('active');
+
+  // Update mobile topbar title
+  const titles = { overview:'Panoramica', agenda:'Agenda', magazzino:'Magazzino', recensioni:'Recensioni', profilo:'Profilo' };
+  const titleEl = document.getElementById('mob-section-title');
+  if (titleEl) titleEl.textContent = titles[sec] || sec;
+
+  // Scroll to top
+  document.querySelector('.db-main').scrollTop = 0;
+}
+
+
+/* ══════════════════════════════════
+   PANORAMICA
+══════════════════════════════════ */
+
+function renderChart() {
+  const max = Math.max(...WEEKLY);
+  document.getElementById('bar-chart').innerHTML = WEEKLY.map((v, i) => {
+    const h = max > 0 ? Math.round((v / max) * 100) : 0;
+    const color = i === 0 ? '#059669' : h > 65 ? '#6ee7b7' : '#d1fae5';
+    return `<div class="chart-bar" style="height:${h || 2}%;background:${color}" title="€${v}"></div>`;
+  }).join('');
+}
+
+function renderOverviewAgenda() {
+  const items = APPOINTMENTS.filter(a => a.day === 'oggi').slice(0, 4);
+  const statusLabel = { 'attesa':'In attesa', 'in-corso':'In corso', 'completato':'Completato' };
+  const statusCls   = { 'attesa':'pill-slate', 'in-corso':'pill-blue', 'completato':'pill-green' };
+  document.getElementById('overview-agenda').innerHTML = items.map(a => `
+    <div class="agenda-mini-row">
+      <div class="shrink-0 text-center w-12">
+        <p class="text-xs font-bold text-stone-700">${a.start}</p>
+        <p class="text-[10px] text-stone-400">→ ${a.end}</p>
+      </div>
+      <div class="w-2 h-2 rounded-full shrink-0" style="background:${a.status==='in-corso'?'#0ea5e9':a.status==='completato'?'#059669':'#94a3b8'}"></div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-stone-900 truncate">${a.type}</p>
+        <p class="text-xs text-stone-400 truncate">${a.client}</p>
+      </div>
+      <span class="pill ${statusCls[a.status]} shrink-0">${statusLabel[a.status]}</span>
+    </div>`).join('');
+}
+
+
+/* ══════════════════════════════════
+   AGENDA
+══════════════════════════════════ */
+
+let agFilter = 'tutti';
+const timers = {}; // id -> { interval, seconds }
+
+function setAgFilter(btn) {
+  document.querySelectorAll('.ag-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  agFilter = btn.dataset.filter;
+  renderAgenda();
+}
+
+function renderAgenda() {
+  renderDayBlock('oggi',   'Oggi',   'day-badge-oggi',   'agenda-oggi-block');
+  renderDayBlock('domani', 'Domani', 'day-badge-domani', 'agenda-domani-block');
+}
+
+function renderDayBlock(day, label, badgeCls, containerId) {
+  let items = APPOINTMENTS.filter(a => a.day === day);
+  if (agFilter !== 'tutti') items = items.filter(a => a.status === agFilter);
+
+  const container = document.getElementById(containerId);
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="day-header"><span class="day-badge ${badgeCls}">${label}</span></div>
+      <div class="widget text-center py-8 text-sm text-stone-400 mb-4">Nessun appuntamento ${agFilter === 'tutti' ? '' : 'con questo stato'} per ${label.toLowerCase()}.</div>`;
+    return;
+  }
+
+  const cards = items.map(a => buildApptCard(a)).join('');
+  container.innerHTML = `
+    <div class="day-header">
+      <span class="day-badge ${badgeCls}">${label}</span>
+      <span class="text-xs text-stone-400">${items.length} appuntament${items.length > 1 ? 'i' : 'o'}</span>
+    </div>
+    ${cards}`;
+}
+
+function buildApptCard(a) {
+  const stLabel = { 'attesa':'In attesa', 'in-corso':'In corso', 'completato':'Completato' };
+  const stCls   = { 'attesa':'st-attesa', 'in-corso':'st-in-corso', 'completato':'st-completato' };
+  const mapUrl  = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.addr)}`;
+
+  const timerHtml = a.status === 'in-corso'
+    ? `<span class="timer-display" id="timer-${a.id}">00:00</span>`
+    : '';
+
+  let actions = '';
+  if (a.status === 'attesa') {
+    actions = `
+      <button class="btn-avvia" onclick="avviaIntervento('${a.id}')">▶ Avvia Intervento</button>`;
+  } else if (a.status === 'in-corso') {
+    actions = `
+      <button class="btn-chiudi" onclick="openPopup('${a.id}')">✓ Chiudi Lavoro</button>`;
+  } else {
+    actions = `<span class="btn-done">✓ Completato</span>`;
+  }
+
+  return `
+  <div class="appt-card appt-${a.status}" id="card-${a.id}">
+    <div class="flex">
+      <div class="appt-card-left-bar"></div>
+      <div class="appt-card-body">
+
+        <!-- Top row -->
+        <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-bold text-stone-900 text-sm">${a.start} – ${a.end}</span>
+            <span class="pill ${stCls[a.status]}">${stLabel[a.status]}</span>
+            ${timerHtml}
+          </div>
+          <span class="text-xs text-stone-400 font-medium">#${a.id}</span>
+        </div>
+
+        <!-- Job type -->
+        <p class="font-semibold text-stone-900 text-base mb-1">${a.type}</p>
+
+        <!-- Client + map -->
+        <div class="flex flex-wrap items-center gap-3 mb-2">
+          <p class="text-sm text-stone-600"><span class="text-stone-400">👤</span> ${a.client}</p>
+          <a href="${mapUrl}" target="_blank" class="btn-map">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0zM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            ${a.addr}
+          </a>
+        </div>
+
+        <!-- Phone + note -->
+        <div class="flex flex-wrap items-center gap-3 mb-4 text-xs text-stone-400">
+          <a href="tel:${a.phone}" class="hover:text-emerald-600 transition-colors">📞 ${a.phone}</a>
+          ${a.note ? `<span class="text-stone-300">|</span><span class="italic text-stone-500">${a.note}</span>` : ''}
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2 flex-wrap">
+          ${actions}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function avviaIntervento(id) {
+  const appt = APPOINTMENTS.find(a => a.id === id);
+  if (!appt || appt.status !== 'attesa') return;
+  appt.status = 'in-corso';
+  renderAgenda();
+  renderOverviewAgenda();
+  startTimer(id);
+}
+
+function startTimer(id) {
+  if (timers[id]) return;
+  let secs = 0;
+  timers[id] = setInterval(() => {
+    secs++;
+    const el = document.getElementById(`timer-${id}`);
+    if (el) {
+      const m = String(Math.floor(secs / 60)).padStart(2, '0');
+      const s = String(secs % 60).padStart(2, '0');
+      el.textContent = `${m}:${s}`;
+    }
+  }, 1000);
+}
+
+/* ── Popup "Pezzi usati" ── */
+let popupTargetId = null;
+const popupQty = {};
+
+function openPopup(id) {
+  popupTargetId = id;
+  const appt = APPOINTMENTS.find(a => a.id === id);
+  document.getElementById('popup-job-label').textContent =
+    `Intervento: ${appt ? appt.type : ''}`;
+
+  // Reset qty
+  INVENTORY.slice(0, 6).forEach(item => { popupQty[item.id] = 0; });
+
+  document.getElementById('popup-items').innerHTML = INVENTORY.slice(0, 6).map(item => `
+    <div class="popup-item-row">
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-stone-900 truncate">${item.name}</p>
+        <p class="text-[10px] text-stone-400">Disponibili: ${item.qty} ${item.unit}</p>
+      </div>
+      <div class="popup-qty-ctrl">
+        <button class="popup-qty-btn" onclick="adjustPopupQty(${item.id},-1)">−</button>
+        <span class="popup-qty-val" id="pqv-${item.id}">0</span>
+        <button class="popup-qty-btn" onclick="adjustPopupQty(${item.id},1)">+</button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('popup-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function adjustPopupQty(itemId, delta) {
+  const item = INVENTORY.find(i => i.id === itemId);
+  if (!item) return;
+  popupQty[itemId] = Math.max(0, Math.min(item.qty, (popupQty[itemId] || 0) + delta));
+  const el = document.getElementById(`pqv-${itemId}`);
+  if (el) el.textContent = popupQty[itemId];
+}
+
+function closePopup(e) {
+  if (e && e.target !== document.getElementById('popup-overlay')) return;
+  document.getElementById('popup-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function confirmPopup() {
+  if (!popupTargetId) return;
+  const appt = APPOINTMENTS.find(a => a.id === popupTargetId);
+  if (!appt) return;
+
+  // Stop timer
+  if (timers[popupTargetId]) {
+    clearInterval(timers[popupTargetId]);
+    delete timers[popupTargetId];
+  }
+
+  // Mark complete
+  appt.status = 'completato';
+
+  // Deduct from inventory and log
+  const log = document.getElementById('activity-log');
+  Object.entries(popupQty).forEach(([idStr, qty]) => {
+    if (qty <= 0) return;
+    const item = INVENTORY.find(i => i.id === Number(idStr));
+    if (!item) return;
+    item.qty = Math.max(0, item.qty - qty);
+    // Inject log row
+    if (log) {
+      const row = document.createElement('div');
+      row.className = 'activity-row';
+      row.style.animation = 'fadeIn .3s ease';
+      row.innerHTML = `<div class="activity-dot" style="background:#ef4444"></div><div class="flex-1 min-w-0"><p class="text-xs text-stone-700 leading-relaxed">📤 Rimossi ${qty} ${item.unit} di <strong>${item.name}</strong> per intervento ${appt.client}</p><p class="text-[10px] text-stone-400 mt-0.5">Adesso</p></div>`;
+      log.prepend(row);
+    }
+  });
+
+  document.getElementById('popup-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  popupTargetId = null;
+
+  renderAgenda();
+  renderOverviewAgenda();
+  filterInventory(); // refresh stock table if visible
+}
+
+
+/* ══════════════════════════════════
+   MAGAZZINO
+══════════════════════════════════ */
+
+let activeCat = 'tutti', lowOnly = false;
+
+function getStockStatus(qty, min) {
+  const pct = min > 0 ? qty / min : 1;
+  if (qty === 0)  return { label:'Esaurito', cls:'badge-crit', barColor:'#ef4444', barPct:0 };
+  if (pct < 0.5)  return { label:'Low Stock', cls:'badge-crit', barColor:'#ef4444', barPct:Math.round(pct*100) };
+  if (pct < 1)    return { label:'Scarso',   cls:'badge-low',  barColor:'#f59e0b', barPct:Math.round(pct*100) };
+  return { label:'OK', cls:'badge-ok', barColor:'#059669', barPct:Math.min(100,Math.round(pct*100)) };
+}
+
+function setCatFilter(btn) {
+  document.querySelectorAll('.mag-filter[data-cat]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = btn.dataset.cat;
+  filterInventory();
+}
+
+function toggleLowOnly() {
+  lowOnly = !lowOnly;
+  document.getElementById('toggle-low').classList.toggle('active', lowOnly);
+  filterInventory();
+}
+
+function filterInventory() {
+  const q = (document.getElementById('mag-search')?.value || '').toLowerCase().trim();
+  const rows = INVENTORY.filter(item => {
+    const matchCat = activeCat === 'tutti' || item.cat === activeCat;
+    const matchQ   = !q || item.name.toLowerCase().includes(q) || item.sku.toLowerCase().includes(q) || item.brand.toLowerCase().includes(q);
+    const matchLow = !lowOnly || (item.qty / item.min) < 1;
+    return matchCat && matchQ && matchLow;
+  });
+  renderMagTable(rows);
+}
+
+function renderMagTable(rows) {
+  const tbody = document.getElementById('mag-tbody');
+  const empty = document.getElementById('mag-empty');
+  const count = document.getElementById('mag-count');
+  if (count) count.textContent = `${rows.length} articol${rows.length === 1 ? 'o' : 'i'}`;
+  if (!rows.length) { if(tbody) tbody.innerHTML = ''; if(empty) empty.classList.remove('hidden'); return; }
+  if(empty) empty.classList.add('hidden');
+  const catColors = { 'Idraulica':'#0ea5e9','Elettronica':'#f59e0b','Minuterie':'#8b5cf6','Termoidr.':'#059669' };
+  if(tbody) tbody.innerHTML = rows.map(item => {
+    const st = getStockStatus(item.qty, item.min);
+    const needsOrder = item.qty / item.min < 1;
+    const cc = catColors[item.cat] || '#64748b';
+    return `<tr>
+      <td><div class="font-medium text-stone-900 text-sm">${item.name}</div><div class="text-[11px] text-stone-400 mt-0.5">${item.fornitore}</div></td>
+      <td><span style="background:${cc}18;color:${cc};font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap">${item.cat}</span></td>
+      <td><span class="font-mono text-[11px] text-stone-500">${item.sku}</span></td>
+      <td><span class="text-xs text-stone-600 font-medium">${item.brand}</span></td>
+      <td><div class="stock-bar-bg"><div class="stock-bar-fill" style="width:${st.barPct}%;background:${st.barColor}"></div></div><div class="text-[10px] text-stone-400 mt-1">${st.barPct}% soglia</div></td>
+      <td><span class="font-semibold text-sm ${item.qty===0?'text-red-600':item.qty/item.min<1?'text-amber-600':'text-stone-800'}">${item.qty}</span><span class="text-stone-400 text-xs"> / min ${item.min} ${item.unit}</span></td>
+      <td><span class="${st.cls}">${st.label==='OK'?'✓':st.label==='Scarso'?'↓':'⚠'} ${st.label}</span></td>
+      <td>${needsOrder ? `<button class="btn-order" onclick="quickOrder(this,'${item.name}','${item.fornitore}')">Ordine Rapido</button>` : `<span class="text-[11px] text-stone-300">—</span>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+function quickOrder(btn, nome, fornitore) {
+  btn.textContent = '…'; btn.classList.add('loading');
+  setTimeout(() => {
+    btn.textContent = '✓ Ordinato'; btn.classList.remove('loading'); btn.classList.add('done');
+    const log = document.getElementById('activity-log');
+    if (log) {
+      const row = document.createElement('div');
+      row.className = 'activity-row'; row.style.animation = 'fadeIn .3s ease';
+      row.innerHTML = `<div class="activity-dot" style="background:#0891b2"></div><div class="flex-1 min-w-0"><p class="text-xs text-stone-700">🛒 Ordine rapido: <strong>${nome}</strong> → ${fornitore}</p><p class="text-[10px] text-stone-400 mt-0.5">Adesso</p></div>`;
+      log.prepend(row);
+    }
+  }, 1600);
+}
+
+function renderActivity() {
+  const log = document.getElementById('activity-log');
+  if (log) log.innerHTML = ACTIVITY.map(a => `
+    <div class="activity-row">
+      <div class="activity-dot" style="background:${a.color}"></div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs text-stone-700 leading-relaxed">${a.icon} ${a.text}</p>
+        <p class="text-[10px] text-stone-400 mt-0.5">${a.time}</p>
+      </div>
+    </div>`).join('');
+}
+
+
+/* ══════════════════════════════════
+   RECENSIONI
+══════════════════════════════════ */
+
+function renderReviews() {
+  const el = document.getElementById('reviews-list');
+  if (el) el.innerHTML = REVIEWS.map(r => {
+    const s = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    return `<div class="review-card">
+      <div class="flex items-center gap-3 mb-2">
+        <img src="${r.avatar}" class="w-9 h-9 rounded-full object-cover ring-2 ring-stone-100 shrink-0"/>
+        <div class="flex-1 min-w-0"><p class="text-sm font-semibold text-stone-900">${r.name}</p><p class="text-[10px] text-stone-400">${r.lavoro} · ${r.date}</p></div>
+        <span class="text-amber-400 text-sm tracking-tight shrink-0">${s}</span>
+      </div>
+      <p class="text-xs text-stone-600 leading-relaxed">${r.text}</p>
+    </div>`;
+  }).join('');
+}
+
+
+/* ══════════════════════════════════
+   BOOT
+══════════════════════════════════ */
+renderChart();
+renderOverviewAgenda();
+renderAgenda();
+filterInventory();
+renderActivity();
+renderReviews();
+
+// Start timer for any appointment already in-corso on load
+APPOINTMENTS.filter(a => a.status === 'in-corso').forEach(a => startTimer(a.id));
+
+</script>
+</body>
+</html>
